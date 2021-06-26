@@ -3,8 +3,8 @@ set ylabel "y/{/Symbol l}"
 set pm3d  
 set pm3d map
 set nokey
-set xrange [0:1]
-set yrange [0:1]
+set xrange [0:300]
+set yrange [0:300]
 #set cbtics format "10^{%L}"
 #set ticslevel 0
 #set cbrange[1E:1E15]
@@ -23,6 +23,6 @@ set ytics out
 
 set size 0.9,1
 #set size square
-splot "output.dat" u 2:1:4 with pm3d
+splot "output.dat" u 1:2:3 with pm3d
 
 replot

@@ -16,7 +16,7 @@ real(8),parameter :: kai_n2=14.32d2/2358.6d2
 
 real(8), parameter :: f=170.0d9 !wave_frequency
 real(8), parameter :: fb=170.0d9 !baced wave_frequency for fixing dx
-real(8), parameter :: amp=1.4d6*dsqrt(2.0d0) !wave_amplitude
+real(8), parameter :: amp=1.0d6*dsqrt(2.0d0) !wave_amplitude
 real(8), parameter :: lam=cc/f
 
 integer :: i,j,k,l,n,m,r,z,v,w
@@ -24,14 +24,15 @@ integer :: num,i_dum,cont_num,cont_num2,point
 integer, parameter :: nmax=10 !calcuration_number !about 20e-6[s]
 integer, parameter :: divx=int(100*fb/f) !cell_division_number
 integer, parameter :: divp=10 !cell_division_number
-integer, parameter :: divt=divx*1.1 !time_division_number
-integer, parameter :: imax=int(300*fb/f)+1 !cell_number
+integer, parameter :: divt=divx*1.1*1.414 !time_division_number
+integer, parameter :: imax=int(300*fb/f)+1 !cell_number x
+integer, parameter :: jmax=int(300*fb/f)+1 !cell_number y
 
 integer, parameter :: sout=10000 !output_interval
 integer, parameter :: lim_out=3001 !output_limit(n/sout)
 integer, parameter :: datamax=1000 !number_of_input_data
 
-!real(8), parameter :: dx=lam/dble(divx) !dt_cell_length
+real(8), parameter :: dx=lam/dble(divx) !dt_cell_length
 real(8), parameter :: dt_g=1.0d0/f !del_time_for_particles
 real(8), parameter :: dt_p=1.0d0/f !del_time_for_particles
 real(8), parameter :: dt_e=1.0d0/f/dble(divt) !del_time_for_waves
@@ -59,7 +60,7 @@ real(8), parameter :: ne0=1.0D20
 real(8), parameter :: teme0=temg0 !electron_temperature[K]
 real(8),parameter :: col0=5.3d9*press0 !collision_frequency[s-1]
 
-
+integer, parameter :: mirror=1
 
 real(8) :: dum,Radius,func_G,PART_Sph
 character(50) :: filename,filename1,filename2,filename3,filename4
