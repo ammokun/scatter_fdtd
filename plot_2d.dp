@@ -23,6 +23,6 @@ set ytics out
 
 set size 0.9,1
 #set size square
-splot "output.dat" u 1:2:3 with pm3d
+splot "output.dat" u 1:2:6 with pm3d
 
 replot

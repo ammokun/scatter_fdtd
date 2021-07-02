@@ -29,7 +29,6 @@ program main
 
     do i=0,imax
         do j=0,jmax
-
             nea(j,i)=0.0d0
             col(j,i)=0.0d0
 
@@ -42,14 +41,22 @@ program main
             hy_i(j,i)=0.0d0
             hy_s(j,i)=0.0d0
             hy(j,i)=0.0d0
-
+            e_rms(j,i)=0.0d0
+            e_rmi(j,i)=0.0d0
         end do
     end do
+
+    !do i=145,155
+    !    do j=145,155
+    !        nea(j,i)=1.0d20
+    !        col(j,i)=1.0d10
+    !    end do
+    !end do          
         do n=1,10 !main loop start
     !!!---------------------!!!
     !!!-----FDTD Scheme-----!!!
     !!!---------------------!!!
-           do m=1,divt !divt loop start
+           do m=1,divt !loop start
               
   !!---Electric Field---!!
   
@@ -59,6 +66,12 @@ program main
               hy_i(j,0)=-ez_i(j,0)/377d0
               hx_i(j,0)=ez_i(j,0)/377d0
             end do
+
+!            do j=1,jmax-1
+!                ez_i(150,0)=amp*dsin(2.0d0*pi*f*t)
+!                hy_i(150,0)=-ez_i(j,0)/377d0
+!                hx_i(150,0)=ez_i(j,0)/377d0
+!            end do
 
             do i=0,imax
                 do j=0,jmax
@@ -75,6 +88,9 @@ program main
             do j=1,jmax-1
                 ez_i(j,imax)=ez_ib(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,imax-1)-ez_ib(j,imax)) !mur absorption for incidnet field           
                 ez_ib(j,imax)=ez_i(j,imax)
+
+                !ez_i(j,0)=ez_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,1)-ez_ib(j,0)) !mur absorption for incidnet field           
+                !ez_ib(j,0)=ez_i(j,0)
             end do
 !
             do i=0,imax
@@ -99,15 +115,20 @@ program main
                  
                  ez_sb(j,i)=ez_s(j,i)
                  
+                ! ez_s(j,i)=(1.0d0-bet_e)/(1.0d0+bet_e)*ez_s(j,i) &
+                !     +ee*nea(j,i)*dt_e/2.0d0/eps0 &
+                !     *(1.0d0+alp_e)/(1.0d0+bet_e)*vele_z(j,i) &
+                !     -bet_e/(1.0d0+bet_e)*(ez_i(j,i)+ez_ib(j,i)) &
+                !     +dt_e/(1.0d0+bet_e)/eps0/dx &
+                !     *(hy_s(j,i)-hy_s(j,i-1)) &
+                !     -dt_e/(1.0d0+bet_e)/eps0/dx &
+                !     *(hx_s(j,i)-hx_s(j-1,i))
                  ez_s(j,i)=(1.0d0-bet_e)/(1.0d0+bet_e)*ez_s(j,i) &
-                     +ee*nea(j,i)*dt_e/2.0d0/eps0 &
-                     *(1.0d0+alp_e)/(1.0d0+bet_e)*vele_z(j,i) &
-                     -bet_e/(1.0d0+bet_e)*(ez_i(j,i)+ez_ib(j,i)) &
                      +dt_e/(1.0d0+bet_e)/eps0/dx &
                      *(hy_s(j,i)-hy_s(j,i-1)) &
                      -dt_e/(1.0d0+bet_e)/eps0/dx &
-                     *(hy_s(j,i)-hy_s(j-1,i))
-                 
+                     *(hx_s(j,i)-hx_s(j-1,i))
+ 
                  vele_z(j,i)=alp_e*vele_z(j,i) &
                      -ee*dt_e/me/gam_e/2.0d0 &
                      *(ez_s(j,i)+ez_sb(j,i)+ez_i(j,i)+ez_ib(j,i))
@@ -119,12 +140,13 @@ program main
               end do
   
               !Mur absorption boundary for scattered field
-              do j=1,jmax-1
+              do j=0,jmax
                 ez_s(j,0)=ez_sb(j,1) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,1)-ez_sb(j,0))
+
                 ez(j,0)=ez_s(j,0)+ez_i(j,0)
               end do
 
-              do i=0,imax
+              do i=1,imax-1
                 ez_s(0,i)=ez_sb(1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(1,i)-ez_sb(0,i))
                 ez(0,i)=ez_s(0,i)+ez_i(0,i)
 
@@ -134,11 +156,11 @@ program main
               end do
             
             if(mirror==1)then
-                do j=1,jmax-1
+                do j=0,jmax
                      ez_s(j,imax)=-ez_i(j,imax)
                 end do
             else 
-                do j=1,jmax-1
+                do j=0,jmax
                     ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
                     ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
                 end do
@@ -157,30 +179,23 @@ program main
   
   !!---Magnetic Field---!!
   
-            do i=0,imax-1
+              do i=0,imax-1
                 do j=0,jmax
                     hy_i(j,i)=hy_i(j,i)+dt_e/mu0/dx*(ez_i(j,i+1)-ez_i(j,i))
+                    hy_s(j,i)=hy_s(j,i)+dt_e/mu0/dx*(ez_s(j,i+1)-ez_s(j,i))
+                    hy(j,i)=hy_i(j,i)+hy_s(j,i)
                 end do
-            end do
+              end do
 
             do i=0,imax
                 do j=0,jmax-1
                     hx_i(j,i)=hx_i(j,i)-dt_e/mu0/dx*(ez_i(j+1,i)-ez_i(j,i))
-                end do
-            end do
-              
-              do i=0,imax-1
-                do j=0,jmax
-                 hy_s(j,i)=hy_s(j,i)+dt_e/mu0/dx*(ez_s(j,i+1)-ez_s(j,i))
-                 hy(j,i)=hy_i(j,i)+hy_s(j,i)
-                end do
-              end do
-            do i=0,imax
-                do j=0,jmax-1
                     hx_s(j,i)=hx_s(j,i)+dt_e/mu0/dx*(ez_s(j+1,i)-ez_s(j,i))
                     hx(j,i)=hx_i(j,i)+hx_s(j,i)
                 end do
             end do
+
+
   
   !!---[END] Magnetic Field---!!
   
@@ -199,19 +214,26 @@ program main
                 e_rmi(j,i)=0.0d0
                 end do
             end do
+
+            if(mod(n,sout)==0) then
+                write(filename,'(a,i5.5,a)') "./output/",n/sout,".dat"
+                open(10, file = filename, form = 'formatted')
+                do i = 0, imax
+                     do j=0,jmax
+                         write(10,100) i,j,ez(j,i),hx(j,i),hy(j,i),ez_i(j,i),hx_i(j,i),hy_i(j,i),ez_s(j,i),hx_s(j,i),hy_s(j,i),&
+                         e_rms(j,i)
+                     end do
+                     write(10,*) " "
+                end do
+                close(10)
+            end if
         end do !end main loop  
+
+        100     format(i15.4,i15.4,1h,100(e15.7,1h,))
   !!!---------------------------!!!
   !!!-----[END] FDTD Scheme-----!!!
   !!!---------------------------!!!
 
 
-           open(10, file = 'output.dat', form = 'formatted')
-           do i = 0, imax
-                do j=0,jmax
-                    write(10,*) i,j,ez_i(j,i),hx_i(j,i),hy_i(j,i)
-                end do
-                write(10,*) " "
-           end do
-           close(10)
 
 end program
