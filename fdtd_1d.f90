@@ -19,7 +19,8 @@ program fdtd_1d
 
     do i=0,imax
         x(i)=dx * i
-        nea(i)=0.0d0
+        nea(i)=1.0d21 &
+        *dexp(-(dble(i-imax*0.9d0)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) 
         col(i)=0.0d0
     end do
 
@@ -36,8 +37,8 @@ program fdtd_1d
   !!!---------------------!!!
   !!!-----FDTD Scheme-----!!!
   !!!---------------------!!!
-        do n=1,10
-           do m=1,divt !divt loop start
+        do n=1,nmax
+           !do m=1,divt !divt loop start
               
   !!---Electric Field---!!
   
@@ -88,14 +89,14 @@ program fdtd_1d
                  +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(1)-ez_sb(0))
               ez(0)=ez_s(0)+ez_i(0)
             
-              if(mirror==1)then
-                 ez_s(imax)=-ez_i(imax)
-              else 
+              !if(mirror==1)then
+               !  ez_s(imax)=-ez_i(imax)
+              !else 
                  ez_s(imax)=ez_sb(imax-1) &
                      +(cc*dt_e-dx)/(cc*dt_e+dx) &
                      *(ez_s(imax-1)-ez_sb(imax)) 
                  ez(imax)=ez_s(imax)+ez_i(imax) !!!!!          
-              end if
+              !end if
   
               ez_sb(0)=ez_s(0)
               ez_sb(imax)=ez_s(imax)
@@ -125,21 +126,26 @@ program fdtd_1d
                  e_rmi(i)=e_rmi(i)+ez(i)**2
               end do
   
-           end do!divt loop end
+           !end do!divt loop end
            do i=0,imax
             e_rms(i)=dsqrt(e_rmi(i)/dble(divt))
             e_rmi(i)=0.0d0
          end do
+
+         if(mod(n,sout)==0) then
+            write(*,*) "n:",n
+            write(filename,'(a,i5.5,a)') "./output/",n,".dat"
+            open(10, file = filename, form = 'formatted')
+            do i = 0, imax
+               write(10,100) i,ez(i),hy(i),ez_i(i),hy_i(i),ez_s(i),hy_s(i)               
+            end do
+            close(10)
+         end if
         end do !end main loop  
   !!!---------------------------!!!
   !!!-----[END] FDTD Scheme-----!!!
   !!!---------------------------!!!
 
-
-           open(10, file = 'output.dat', form = 'formatted')
-           do i = 0, imax
-               write(10,*) i,x(i), e_rms(i)
-           end do
-           close(10)
+        100     format(i15.4,1h,100(e15.7,1h,))
 
 end program

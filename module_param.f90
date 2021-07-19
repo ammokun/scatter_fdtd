@@ -21,14 +21,14 @@ module module_param
     
     integer :: i,j,k,l,n,m,r,z,v,w
     integer :: num,i_dum,cont_num,cont_num2,point
-    integer, parameter :: nmax=10 !calcuration_number !about 20e-6[s]
+    integer, parameter :: nmax=1000 !calcuration_number !about 20e-6[s]
     integer, parameter :: divx=int(100*fb/f) !cell_division_number
     integer, parameter :: divp=10 !cell_division_number
     integer, parameter :: divt=divx*1.1*1.414 !time_division_number
-    integer, parameter :: imax=int(300*fb/f)+1 !cell_number x
-    integer, parameter :: jmax=int(300*fb/f)+1 !cell_number y
+    integer, parameter :: imax=int(300*fb/f) !cell_number x
+    integer, parameter :: jmax=int(300*fb/f) !cell_number y
     
-    integer, parameter :: sout=1 !output_interval
+    integer, parameter :: sout=10 !output_interval
     integer, parameter :: lim_out=3001 !output_limit(n/sout)
     integer, parameter :: datamax=1000 !number_of_input_data
     
