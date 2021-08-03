@@ -9,6 +9,7 @@ program main
     real(8), dimension(0:jmax,0:imax) :: hy_s,hy_i,hy,hx_s,hx_i,hx,vele_z,jdotE,hy_sb,hy_ib,hx_sb,hx_ib
     real(8), dimension(0:jmax,0:imax) :: e_rmi,e_rms,e_eff,xx,xx_in
     real(8), dimension(0:jmax,0:imax) :: nea,neb,ne,ne_m
+    real(8), dimension(0:jmax,0:imax) :: ne_fdtd,col_fdtd
     real(8), dimension(0:jmax,0:imax) :: nia,nib
     real(8), dimension(0:jmax,0:imax) :: nna,nnb
     real(8), dimension(0:jmax,0:imax) :: col,mu_e,mu_a,mu_i,mu_n,mu_in
@@ -31,6 +32,8 @@ program main
         do j=0,jmax
             nea(j,i)=0.0d0
             col(j,i)=0.0d0
+            ne_fdtd(j,i)=0.0d0
+            col_fdtd(j,i)=0.0d0
 
             ez_i(j,i)=0.0d0
             ez_s(j,i)=0.0d0
@@ -47,16 +50,23 @@ program main
         end do
     end do
 
-   do i=1,imax-1
-        do j=1,jmax-1
-            nea(j,i)=1.0d021 &
-            *dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
-            *dexp(-(dble(j-150)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
-            col(j,i)=1.0d12 &
-            *dexp(-(dble(i-imax*0.9d0)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
-            *dexp(-(dble(j-jmax*0.50d0)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
+   do i=200,220
+        do j=140,160
+            nea(j,i)=1.0d021 !&
+            !*dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
+            !*dexp(-(dble(j-149)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
+            col(j,i)=1.0d12 !&
+            !*dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
+            !*dexp(-(dble(j-149)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
         end do
     end do          
+
+    do i=1,imax-1
+      do j=1,jmax-1
+          ne_fdtd(j,i)=nea(j,i)
+          col_fdtd(j,i)=col(j,i)
+      end do
+  end do                
         do n=1,nmax !main loop start
     !!!---------------------!!!
     !!!-----FDTD Scheme-----!!!
@@ -90,21 +100,21 @@ program main
               end do                          
             end do 
 
-            do j=0,jmax
-                ez_i(j,imax)=ez_ib(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,imax-1)-ez_ib(j,imax)) !mur absorption for incidnet field           
-                ez_ib(j,imax)=ez_i(j,imax)
-                ez_i(j,0)=ez_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,1)-ez_ib(j,0)) !mur absorption for incidnet field           
-                ez_ib(j,0)=ez_i(j,0)
-            end do
-
-            do i=0,imax
-                ez_i(0,i)=ez_ib(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(1,i)-ez_ib(0,i)) !mur absorption for incidnet field           
-                ez_ib(0,i)=ez_i(0,i)
-                
-                !ez_i(jmax,i)=ez_ib(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(jmax-1,i)-ez_ib(jmax,i)) !mur absorption for incidnet field           
-                !ez_ib(jmax,i)=ez_i(jmax,i)
-                !jmaxあたりで減衰する
-            end do
+!            do j=0,jmax
+!                ez_i(j,imax)=ez_ib(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,imax-1)-ez_ib(j,imax)) !mur absorption for incidnet field           
+!                ez_ib(j,imax)=ez_i(j,imax)
+!                ez_i(j,0)=ez_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,1)-ez_ib(j,0)) !mur absorption for incidnet field           
+!                ez_ib(j,0)=ez_i(j,0)
+!            end do
+!
+!            do i=0,imax
+!                ez_i(0,i)=ez_ib(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(1,i)-ez_ib(0,i)) !mur absorption for incidnet field           
+!                ez_ib(0,i)=ez_i(0,i)
+!                
+!                !ez_i(jmax,i)=ez_ib(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(jmax-1,i)-ez_ib(jmax,i)) !mur absorption for incidnet field           
+!                !ez_ib(jmax,i)=ez_i(jmax,i)
+!                !jmaxあたりで減衰する
+!            end do
   !-[END] Incidnt-!
   
   !-Add Scatter-!
@@ -156,37 +166,37 @@ program main
 
 
   
-              !Mur absorption boundary for scattered field
-              do j=1,jmax-1
-                ez_s(j,0)=ez_sb(j,1) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,1)-ez_sb(j,0))
-                ez(j,0)=ez_s(j,0)+ez_i(j,0)
-                ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
-                ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
-              end do
-
-              do i=1,imax-1
-                ez_s(0,i)=ez_sb(1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(1,i)-ez_sb(0,i))
-                ez(0,i)=ez_s(0,i)+ez_i(0,i)
-                ez_s(jmax,i)=ez_sb(jmax-1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(jmax-1,i)-ez_sb(jmax,i))
-                ez(jmax,i)=ez_s(jmax,i)+ez_i(jmax,i)
-              end do
-            
-            !if(mirror==1)then
-            !    do j=0,jmax
-            !         ez_s(j,imax)=-ez_i(j,imax)
-            !    end do
-            !else 
-                do j=0,jmax
-                    ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
-                    ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
-                end do
-                                
-            !end if
-            
-            do j=0,jmax
-              ez_sb(j,0)=ez_s(j,0)
-              ez_sb(j,imax)=ez_s(j,imax)
-            end do
+!              !Mur absorption boundary for scattered field
+!              do j=1,jmax-1
+!                ez_s(j,0)=ez_sb(j,1) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,1)-ez_sb(j,0))
+!                ez(j,0)=ez_s(j,0)+ez_i(j,0)
+!                ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
+!                ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
+!              end do
+!
+!              do i=1,imax-1
+!                ez_s(0,i)=ez_sb(1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(1,i)-ez_sb(0,i))
+!                ez(0,i)=ez_s(0,i)+ez_i(0,i)
+!                ez_s(jmax,i)=ez_sb(jmax-1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(jmax-1,i)-ez_sb(jmax,i))
+!                ez(jmax,i)=ez_s(jmax,i)+ez_i(jmax,i)
+!              end do
+!            
+!            !if(mirror==1)then
+!            !    do j=0,jmax
+!            !         ez_s(j,imax)=-ez_i(j,imax)
+!            !    end do
+!            !else 
+!                do j=0,jmax
+!                    ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
+!                    ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
+!                end do
+!                                
+!            !end if
+!            
+!            do j=0,jmax
+!              ez_sb(j,0)=ez_s(j,0)
+!              ez_sb(j,imax)=ez_s(j,imax)
+!            end do
   !-[END] Add Scatter-!               
   
               t=t+0.5d0*dt_e
@@ -218,6 +228,22 @@ program main
                 hy(jmax,i)=hy_i(jmax,i)+hy_s(jmax,i)
             end do
 
+            do j=1,jmax-1
+              hy_i(j,0)=hy_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_i(j,1)-hy_ib(j,0)) !mur absorption for incidnet field           
+              hy_ib(j,0)=hy_i(j,0)
+              
+              hy_i(j,imax)=hy_ib(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_i(j,imax-1)-hy_ib(j,imax)) !mur absorption for incidnet field           
+              hy_ib(j,imax)=hy_i(j,imax)x
+              hy_s(j,0)=hy_sb(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_s(j,1)-hy_sb(j,0)) !mur absorption for incidnet field           
+              hy_sb(j,0)=hy_s(j,0)
+              
+              hy_s(j,imax)=hy_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_s(j,imax-1)-hy_sb(jmax,i)) !mur absorption for incidnet field           
+              hy_sb(j,imax)=hy_s(j,imax)
+
+              hy(j,0)=hy_i(j,0)+hy_s(j,0)
+              hy(j,imax)=hy_i(j,imax)+hy_s(j,imax)
+          end do
+
             do i=0,imax
                 do j=0,jmax-1
                     hx_i(j,i)=hx_i(j,i)-dt_e/mu0/dx*(ez_i(j+1,i)-ez_i(j,i))
@@ -240,6 +266,10 @@ program main
 
               hx(0,i)=hx_i(0,i)+hx_s(0,i)
               hx(jmax,i)=hx_i(jmax,i)+hx_s(jmax,i)
+            end do
+
+            do j=0,jmax
+              
             end do
 
 
