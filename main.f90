@@ -78,8 +78,8 @@ program main
   !-Incidnt-!
             do j=0,jmax
               ez_i(j,0)=amp*dsin(2.0d0*pi*f*t)
-              !hy_i(j,0)=-ez_i(j,0)/377d0
-              !hx_i(j,0)=ez_i(j,0)/377d0
+              hy_i(j,0)=-ez_i(j,0)/377d0
+              hx_i(j,0)=ez_i(j,0)/377d0
             end do
 
 !            do j=1,jmax-1
@@ -166,20 +166,34 @@ program main
 
 
   
-!              !Mur absorption boundary for scattered field
-!              do j=1,jmax-1
-!                ez_s(j,0)=ez_sb(j,1) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,1)-ez_sb(j,0))
-!                ez(j,0)=ez_s(j,0)+ez_i(j,0)
-!                ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
-!                ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
-!              end do
-!
-!              do i=1,imax-1
-!                ez_s(0,i)=ez_sb(1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(1,i)-ez_sb(0,i))
-!                ez(0,i)=ez_s(0,i)+ez_i(0,i)
-!                ez_s(jmax,i)=ez_sb(jmax-1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(jmax-1,i)-ez_sb(jmax,i))
-!                ez(jmax,i)=ez_s(jmax,i)+ez_i(jmax,i)
-!              end do
+              !Mur absorption boundary for scattered field
+              do j=1,jmax-1
+                ez_s(j,0)=ez_sb(j,1) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,1)-ez_sb(j,0))
+                ez_sb(j,0)=ez_s(j,0)
+                ez_sb(j,1)=ez_s(j,1)
+                
+                ez(j,0)=ez_s(j,0)+ez_i(j,0)
+                ez_s(j,imax)=ez_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,imax-1)-ez_sb(j,imax)) 
+                ez_sb(j,imax)=ez_s(j,imax)
+                ez_sb(j,imax-1)=ez_s(j,imax-1)
+                
+                ez(j,imax)=ez_s(j,imax)+ez_i(j,imax) !!!!!
+              end do
+
+              do i=1,imax-1
+                ez_s(0,i)=ez_sb(1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(1,i)-ez_sb(0,i))
+                ez_sb(0,i)=ez_s(0,i)
+                ez_sb(1,i)=ez_s(1,i)
+
+                ez(0,i)=ez_s(0,i)+ez_i(0,i)
+                
+                ez_s(jmax,i)=ez_sb(jmax-1,i) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(jmax-1,i)-ez_sb(jmax,i))
+                ez_sb(jmax,i)=ez_s(jmax,i)
+                ez_sb(jmax-1,i)=ez_s(jmax-1,i)
+
+
+                ez(jmax,i)=ez_s(jmax,i)+ez_i(jmax,i)
+              end do
 !            
 !            !if(mirror==1)then
 !            !    do j=0,jmax
@@ -215,14 +229,19 @@ program main
             do i=1,imax-1
                 hy_i(0,i)=hy_ib(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_i(1,i)-hy_ib(0,i)) !mur absorption for incidnet field           
                 hy_ib(0,i)=hy_i(0,i)
+                hy_ib(1,i)=hy_i(1,i)
                 
                 hy_i(jmax,i)=hy_ib(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_i(jmax-1,i)-hy_ib(jmax,i)) !mur absorption for incidnet field           
                 hy_ib(jmax,i)=hy_i(jmax,i)
+                hy_ib(jmax-1,i)=hy_i(jmax-1,i)
+                
                 hy_s(0,i)=hy_sb(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_s(1,i)-hy_sb(0,i)) !mur absorption for incidnet field           
               hy_sb(0,i)=hy_s(0,i)
+              hy_sb(1,i)=hy_s(1,i)
                 
                 hy_s(jmax,i)=hy_sb(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_s(jmax-1,i)-hy_sb(jmax,i)) !mur absorption for incidnet field           
                 hy_sb(jmax,i)=hy_s(jmax,i)
+                hy_sb(jmax-1,i)=hy_s(jmax-1,i)
 
                 hy(0,i)=hy_i(0,i)+hy_s(0,i)
                 hy(jmax,i)=hy_i(jmax,i)+hy_s(jmax,i)
@@ -231,14 +250,19 @@ program main
             do j=1,jmax-1
               hy_i(j,0)=hy_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_i(j,1)-hy_ib(j,0)) !mur absorption for incidnet field           
               hy_ib(j,0)=hy_i(j,0)
+              hy_ib(j,1)=hy_i(j,1)
               
               hy_i(j,imax)=hy_ib(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_i(j,imax-1)-hy_ib(j,imax)) !mur absorption for incidnet field           
               hy_ib(j,imax)=hy_i(j,imax)
+              hy_ib(j,imax-1)=hy_i(j,imax-1)
+
               hy_s(j,0)=hy_sb(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_s(j,1)-hy_sb(j,0)) !mur absorption for incidnet field           
               hy_sb(j,0)=hy_s(j,0)
+              hy_sb(j,1)=hy_s(j,1)
               
               hy_s(j,imax)=hy_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hy_s(j,imax-1)-hy_sb(jmax,i)) !mur absorption for incidnet field           
               hy_sb(j,imax)=hy_s(j,imax)
+              hy_sb(j,imax-1)=hy_s(j,imax-1)
 
               hy(j,0)=hy_i(j,0)+hy_s(j,0)
               hy(j,imax)=hy_i(j,imax)+hy_s(j,imax)
@@ -254,15 +278,19 @@ program main
             do i=0,imax
               hx_i(0,i)=hx_ib(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_i(1,i)-hx_ib(0,i)) !mur absorption for incidnet field           
               hx_ib(0,i)=hx_i(0,i)
+              hx_ib(1,i)=hx_i(1,i)
               
               hx_i(jmax,i)=hx_ib(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_i(jmax-1,i)-hx_ib(jmax,i)) !mur absorption for incidnet field           
               hx_ib(jmax,i)=hx_i(jmax,i)
+              hx_ib(jmax-1,i)=hx_i(jmax-1,i)
 
               hx_s(0,i)=hx_sb(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_s(1,i)-hx_sb(0,i)) !mur absorption for incidnet field           
               hx_sb(0,i)=hx_s(0,i)
+              hx_sb(1,i)=hx_s(1,i)
               
               hx_s(jmax,i)=hx_sb(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_s(jmax-1,i)-hx_sb(jmax,i)) !mur absorption for incidnet field           
               hx_sb(jmax,i)=hx_s(jmax,i)
+              hx_sb(jmax-1,i)=hx_s(jmax-1,i)
 
               hx(0,i)=hx_i(0,i)+hx_s(0,i)
               hx(jmax,i)=hx_i(jmax,i)+hx_s(jmax,i)
@@ -271,15 +299,19 @@ program main
             do j=0,jmax
               hx_i(j,0)=hx_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_i(j,1)-hx_ib(j,0)) !mur absorption for incidnet field           
               hx_ib(j,0)=hx_i(j,0)
+              hx_ib(j,1)=hx_i(j,1)
               
               hx_i(j,imax)=hx_ib(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_i(j,imax-1)-hx_ib(j,imax)) !mur absorption for incidnet field           
               hx_ib(j,imax)=hx_i(j,imax)
+              hx_ib(j,imax-1)=hx_i(j,imax-1)
 
               hx_s(j,0)=hx_sb(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_s(j,1)-hx_sb(j,0)) !mur absorption for incidnet field           
               hx_sb(j,0)=hx_s(j,0)
+              hx_sb(j,1)=hx_s(j,1)
               
               hx_s(j,imax)=hx_sb(j,imax-1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(hx_s(j,imax-1)-hx_sb(j,imax)) !mur absorption for incidnet field           
               hx_sb(j,imax)=hx_s(j,imax)
+              hx_sb(j,imax-1)=hx_s(j,imax-1)
 
               hx(j,0)=hx_i(j,0)+hx_s(j,0)
               hx(j,imax)=hx_i(j,imax)+hx_s(j,imax)              
