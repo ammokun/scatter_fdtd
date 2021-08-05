@@ -100,22 +100,22 @@ program main
                 ez_ib(j,imax)=ez_i(j,imax)
                 ez_ib(j,imax-1)=ez_i(j,imax-1)
 
-                !ez_i(j,0)=ez_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,1)-ez_ib(j,0)) !mur absorption for incidnet field           
-                !ez_ib(j,0)=ez_i(j,0)
-                !ez_ib(j,1)=ez_i(j,1)
+                ez_i(j,0)=ez_ib(j,1)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(j,1)-ez_ib(j,0)) !mur absorption for incidnet field           
+                ez_ib(j,0)=ez_i(j,0)
+                ez_ib(j,1)=ez_i(j,1)
               
             end do
 
-            do i=0,imax
-                ez_i(0,i)=ez_ib(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(1,i)-ez_ib(0,i)) !mur absorption for incidnet field           
-                ez_ib(0,i)=ez_i(0,i)
-                ez_ib(1,i)=ez_i(1,i)
-                
-                ez_i(jmax,i)=ez_ib(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(jmax-1,i)-ez_ib(jmax,i)) !mur absorption for incidnet field           
-                ez_ib(jmax,i)=ez_i(jmax,i)
-                ez_ib(jmax-1,i)=ez_i(jmax-1,i)
-                !jmaxあたりで減衰する
-            end do
+          !  do i=0,imax
+          !      ez_i(0,i)=ez_ib(1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(1,i)-ez_ib(0,i)) !mur absorption for incidnet field           
+          !      ez_ib(0,i)=ez_i(0,i)
+          !      ez_ib(1,i)=ez_i(1,i)
+          !      
+          !      ez_i(jmax,i)=ez_ib(jmax-1,i)+(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_i(jmax-1,i)-ez_ib(jmax,i)) !mur absorption for incidnet field           
+          !      ez_ib(jmax,i)=ez_i(jmax,i)
+          !      ez_ib(jmax-1,i)=ez_i(jmax-1,i)
+          !      !jmaxあたりで減衰する
+          !  end do
 
   !-[END] Incidnt-!
   
@@ -171,8 +171,8 @@ program main
               !Mur absorption boundary for scattered field
               do j=0,jmax
                 ez_s(j,0)=ez_sb(j,1) +(cc*dt_e-dx)/(cc*dt_e+dx)*(ez_s(j,1)-ez_sb(j,0))
-                ez_sb(j,0)=ez_sb(j,0)
-                ez_sb(j,1)=ez_sb(j,1)
+                ez_sb(j,0)=ez_s(j,0)
+                ez_sb(j,1)=ez_s(j,1)
 
                 ez(j,0)=ez_s(j,0)+ez_i(j,0)
 
