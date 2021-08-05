@@ -52,12 +52,12 @@ program main
 
    do i=200,220
         do j=140,160
-            nea(j,i)=1.0d021 !&
-            !*dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
-            !*dexp(-(dble(j-149)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
-            col(j,i)=1.0d12 !&
-            !*dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
-            !*dexp(-(dble(j-149)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
+            nea(j,i)=1.0d021 &
+            *dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
+            *dexp(-(dble(j-149)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
+            col(j,i)=1.0d12 &
+            *dexp(-(dble(i-200)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) &
+            *dexp(-(dble(j-149)*dx)**2/(2.0d0*(1.0d-3*fb/f)**2)) !!!!!
         end do
     end do          
 
