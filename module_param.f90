@@ -28,7 +28,7 @@ module module_param
     integer, parameter :: imax=int(300*fb/f) !cell_number x
     integer, parameter :: jmax=int(300*fb/f) !cell_number y
     
-    integer, parameter :: sout=50 !output_interval
+    integer, parameter :: sout=10 !output_interval
     integer, parameter :: lim_out=3001 !output_limit(n/sout)
     integer, parameter :: datamax=1000 !number_of_input_data
     

@@ -8,7 +8,7 @@ unset label
 set label time at graph 0.8,0.9
 
 #splot filename u 1:2:3 with pm3d #Ez
-splot filename u 1:2:7 with pm3d #Ez_s
+splot filename u 1:2:3 with pm3d #Ez_s
 
 pause 0.2
 #-------------------------------------------------------------------------------
